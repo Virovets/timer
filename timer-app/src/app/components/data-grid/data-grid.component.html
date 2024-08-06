@@ -1,0 +1,85 @@
+<div class="container">
+  <div class="timer-wrapper">
+    <app-timer (updateSecond)="updateCurrentSecond($event)"></app-timer>
+    <div class="color-bar" [ngStyle]="{ 'background-color': currentColor() }"></div>
+  </div>
+  <div class="btn-wrapper">
+    <button class="new-btn" (click)="toggleNewRowForm()"><mat-icon>add</mat-icon> New</button>
+  </div>
+
+  <table mat-table [dataSource]="tableData$" class="mat-elevation-z8">
+    <ng-container matColumnDef="fromSeconds">
+      <th mat-header-cell *matHeaderCellDef>From seconds</th>
+      <td mat-cell *matCellDef="let element">{{element.fromSecond}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="toSeconds">
+      <th mat-header-cell *matHeaderCellDef>To Seconds</th>
+      <td mat-cell *matCellDef="let element">{{element.toSecond}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="color">
+      <th mat-header-cell *matHeaderCellDef>Color</th>
+      <td mat-cell *matCellDef="let element">
+        <div class="color-box" [ngStyle]="{ 'background-color': element.color }"></div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let element">
+        <button (click)="removeRow(element)"><mat-icon>delete</mat-icon>Delete</button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <form [formGroup]="newRowForm" (ngSubmit)="addRow()" *ngIf="showNewRowForm()">
+    <div class="input-wrapper">
+      <mat-form-field class="example-full-width"  >
+        <mat-label>From Seconds</mat-label>
+        <input matInput type="number" formControlName="fromSecond" placeholder="From">
+      </mat-form-field>
+      <ng-container *ngIf="control['fromSecond']?.touched && control['fromSecond']?.invalid">
+        <mat-error>{{checkRangeError(control['fromSecond'], 'fromSecond')}}</mat-error>
+      </ng-container>
+
+      <ng-container *ngIf="control['toSecond']?.valid && isFormError('fromGreaterThanTo')">
+        <mat-error>{{checkRangeError(newRowForm, 'toSecond')}}</mat-error>
+      </ng-container>
+    </div>
+
+    <div class="input-wrapper">
+      <mat-form-field class="example-full-width"  >
+        <mat-label>To Seconds</mat-label>
+        <input matInput type="number" placeholder="To" formControlName="toSecond">
+      </mat-form-field>
+      <ng-container *ngIf="control['toSecond']?.touched && control['toSecond']?.invalid">
+        <mat-error>{{checkRangeError(control['toSecond'], 'toSecond')}}</mat-error>
+      </ng-container>
+    </div>
+
+    <div class="input-wrapper">
+      <mat-form-field class="example-full-width">
+        <mat-label>Color</mat-label>
+        <input matInput type="color" formControlName="color">
+      </mat-form-field>
+      <ng-container *ngIf="isFormError('colorConflict')">
+        <mat-error>{{checkColorError()}}</mat-error>
+      </ng-container>
+    </div>
+
+    <div class="input-wrapper">
+      <button [disabled]="newRowForm.invalid"  type="submit" class="submit-btn">Add</button>
+    </div>
+  </form>
+
+  <div class="range-error">
+    <ng-container *ngIf="control['toSecond']?.valid && isFormError('timeRangeConflict')">
+      <mat-error>{{checkRangeError(newRowForm, 'toSecond')}}</mat-error>
+    </ng-container>
+  </div>
+
+</div>
