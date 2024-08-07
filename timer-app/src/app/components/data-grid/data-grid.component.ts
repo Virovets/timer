@@ -117,22 +117,13 @@ export class GridComponent implements OnInit {
   }
 
   checkRangeError(formControl: AbstractControl, formControlName: string): string {
-    if (formControl.hasError('required')) {
-      return errors[formControlName].required;
+    const errorMessages: any = errors[formControlName];
+    for (let errorKey of Object.keys(errorMessages)) {
+      if (formControl.hasError(errorKey)) {
+        return errorMessages[errorKey];
+      }
     }
-    if (formControl.hasError('min')) {
-      return errors[formControlName].min;
-    }
-    if (formControl.hasError('max')) {
-      return errors[formControlName].max;
-    }
-    if (formControl.hasError('timeRangeConflict')) {
-      return errors[formControlName].timeRangeConflict;
-    }
-    if (formControl.hasError('fromGreaterThanTo')) {
-      return errors[formControlName].fromGreaterThanTo;
-    }
-    return ''
+    return '';
   }
 
   isFormError(error: string): boolean {
