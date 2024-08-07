@@ -36,50 +36,53 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
 
-  <form [formGroup]="newRowForm" (ngSubmit)="addRow()" *ngIf="showNewRowForm()">
-    <div class="input-wrapper">
-      <mat-form-field class="example-full-width"  >
-        <mat-label>From Seconds</mat-label>
-        <input matInput type="number" formControlName="fromSecond" placeholder="From">
-      </mat-form-field>
-      <ng-container *ngIf="control['fromSecond']?.touched && control['fromSecond']?.invalid">
-        <mat-error>{{checkRangeError(control['fromSecond'], 'fromSecond')}}</mat-error>
-      </ng-container>
+  @if (showNewRowForm()) {
+    <form [formGroup]="newRowForm" (ngSubmit)="addRow()">
+      <div class="input-wrapper">
+        <mat-form-field class="example-full-width"  >
+          <mat-label>From Seconds</mat-label>
+          <input matInput type="number" formControlName="fromSecond" placeholder="From">
+        </mat-form-field>
+        @if (control['fromSecond']?.touched && control['fromSecond']?.invalid) {
+          <mat-error>{{checkRangeError(control['fromSecond'], 'fromSecond')}}</mat-error>
+        }
 
-      <ng-container *ngIf="control['toSecond']?.valid && isFormError('fromGreaterThanTo')">
-        <mat-error>{{checkRangeError(newRowForm, 'toSecond')}}</mat-error>
-      </ng-container>
-    </div>
+        @if (control['toSecond']?.valid && isFormError('fromGreaterThanTo')) {
+          <mat-error>{{checkRangeError(newRowForm, 'toSecond')}}</mat-error>
+        }
+      </div>
 
-    <div class="input-wrapper">
-      <mat-form-field class="example-full-width"  >
-        <mat-label>To Seconds</mat-label>
-        <input matInput type="number" placeholder="To" formControlName="toSecond">
-      </mat-form-field>
-      <ng-container *ngIf="control['toSecond']?.touched && control['toSecond']?.invalid">
-        <mat-error>{{checkRangeError(control['toSecond'], 'toSecond')}}</mat-error>
-      </ng-container>
-    </div>
+      <div class="input-wrapper">
+        <mat-form-field class="example-full-width"  >
+          <mat-label>To Seconds</mat-label>
+          <input matInput type="number" placeholder="To" formControlName="toSecond">
+        </mat-form-field>
 
-    <div class="input-wrapper">
-      <mat-form-field class="example-full-width">
-        <mat-label>Color</mat-label>
-        <input matInput type="color" formControlName="color">
-      </mat-form-field>
-      <ng-container *ngIf="isFormError('colorConflict')">
-        <mat-error>{{checkColorError()}}</mat-error>
-      </ng-container>
-    </div>
+        @if (control['toSecond']?.touched && control['toSecond']?.invalid) {
+          <mat-error>{{checkRangeError(control['toSecond'], 'toSecond')}}</mat-error>
+        }
+      </div>
 
-    <div class="input-wrapper">
-      <button [disabled]="newRowForm.invalid"  type="submit" class="submit-btn">Add</button>
-    </div>
-  </form>
+      <div class="input-wrapper">
+        <mat-form-field class="example-full-width">
+          <mat-label>Color</mat-label>
+          <input matInput type="color" formControlName="color">
+        </mat-form-field>
+        @if (isFormError('colorConflict')) {
+          <mat-error>{{checkColorError()}}</mat-error>
+        }
+      </div>
+
+      <div class="input-wrapper">
+        <button [disabled]="newRowForm.invalid"  type="submit" class="submit-btn">Add</button>
+      </div>
+    </form>
+  }
 
   <div class="range-error">
-    <ng-container *ngIf="control['toSecond']?.valid && isFormError('timeRangeConflict')">
+    @if (control['toSecond']?.valid && isFormError('timeRangeConflict')) {
       <mat-error>{{checkRangeError(newRowForm, 'toSecond')}}</mat-error>
-    </ng-container>
+    }
   </div>
 
 </div>
