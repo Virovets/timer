@@ -1,32 +1,13 @@
-import {Component, signal, computed, OnInit, inject} from '@angular/core';
+import {Component, OnInit, inject, signal, computed} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-  Validators
-} from '@angular/forms';
-import {TimerComponent} from "../timer/timer.component";
-import {BehaviorSubject, delay, Observable, of} from "rxjs";
-import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
-import {
-  MatCell, MatCellDef,
-  MatColumnDef,
-  MatHeaderCell, MatHeaderCellDef,
-  MatHeaderRow,
-  MatHeaderRowDef,
-  MatRow, MatRowDef,
-  MatTable
-} from "@angular/material/table";
-import {MatButton} from "@angular/material/button";
-import {MatIcon} from "@angular/material/icon";
-import {MatInput} from "@angular/material/input";
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TimerComponent } from '../timer/timer.component';
+import { MatError } from '@angular/material/form-field';
+import { errors } from '../../../core/helpers/static-data';
+import {DataService} from "../../../core/services/data.service";
+import {ValidationService} from "../../../core/services/validation.service";
 import {GridData} from "../../../core/interfaces/interfaces";
-import {errors} from "../../../core/helpers/static-data";
+import {MaterialModule} from "../../../core/modules/material.module";
 
 @Component({
   selector: 'app-grid',
@@ -36,80 +17,36 @@ import {errors} from "../../../core/helpers/static-data";
     FormsModule,
     TimerComponent,
     ReactiveFormsModule,
-    MatFormField,
-    MatIcon,
-    MatError,
-    MatTable,
-    MatColumnDef,
-    MatHeaderCell,
-    MatCell,
-    MatButton,
-    MatHeaderRow,
-    MatRow,
-    MatHeaderRowDef,
-    MatRowDef,
-    MatCellDef,
-    MatHeaderCellDef,
-    MatLabel,
-    MatInput
+    MaterialModule,
+    MatError
   ],
   templateUrl: './data-grid.component.html',
-  styleUrl: './data-grid.component.scss'
+  styleUrls: ['./data-grid.component.scss']
 })
 export class GridComponent implements OnInit {
-  public tableData$: BehaviorSubject<GridData[]> = new BehaviorSubject<GridData[]>([]);
+  private dataService = inject(DataService);
+  private validationService = inject(ValidationService);
+  public tableData$ = this.dataService.tableData$;
   public displayedColumns = ['fromSeconds', 'toSeconds', 'color', 'actions'];
-  private _rowsData = [
-    { fromSecond: 5, toSecond: 15, color: '#000000' },
-  ];
   public newRowForm!: FormGroup;
   showNewRowForm = signal(false);
   currentSecond = signal(0);
   currentColor = computed(() => {
     const second = this.currentSecond();
-    const row = this._rowsData.find(r => r.fromSecond <= second && r.toSecond >= second);
+    const row = this.dataService.rowsData.find(r => r.fromSecond <= second && r.toSecond >= second);
     return row ? row.color : '#ffffff';
   });
   private _fb = inject(FormBuilder);
 
-  updateView() {
-    this.tableData$.next(this._rowsData);
-  }
-
   ngOnInit() {
-    this.updateView();
     this.newRowForm = this._fb.group({
       fromSecond: ['', [Validators.required, Validators.min(0), Validators.max(58)]],
       toSecond: ['', [Validators.required, Validators.min(1), Validators.max(59)]],
-      color:  ['#000000', [Validators.required]],
+      color: ['#000000', [Validators.required]],
     }, {
-      validators: this.fromToValidator(),
-      asyncValidators: [this.checkTimeConflict.bind(this), this.checkColorConflict.bind(this)]
+      validators: this.validationService.fromToValidator(),
+      asyncValidators: [this.validationService.checkTimeConflict.bind(this.validationService), this.validationService.checkColorConflict.bind(this.validationService)]
     });
-  }
-
-
-  checkTimeConflict(control: AbstractControl): Observable<ValidationErrors | null> {
-      const { fromSecond, toSecond } = control.value;
-      const timeConflict = this._rowsData.some(row =>
-        (fromSecond >= row.fromSecond && fromSecond <= row.toSecond) ||
-        (toSecond >= row.fromSecond && toSecond <= row.toSecond) ||
-        (fromSecond <= row.fromSecond && toSecond >= row.toSecond)
-      );
-
-      const uniqueSeconds = !this._rowsData.some(row =>
-        (fromSecond === row.fromSecond || toSecond === row.toSecond)
-      );
-
-      const errors: ValidationErrors = {};
-      if (timeConflict) {
-        errors['timeRangeConflict'] = true;
-      }
-      if (!uniqueSeconds) {
-        errors['timeRangeConflict'] = true;
-      }
-
-      return of(Object.keys(errors).length ? errors : null).pipe(delay(500));
   }
 
   get control() {
@@ -130,13 +67,6 @@ export class GridComponent implements OnInit {
     return this.newRowForm.hasError(error);
   }
 
-
-  checkColorConflict(control: AbstractControl): Observable<ValidationErrors | null> {
-    const color = control.get('color')?.value;
-    const conflict = this._rowsData.some(row => row.color === color);
-    return of(conflict ? { colorConflict: true } : null).pipe(delay(500));
-  }
-
   checkColorError(): string {
     if (this.newRowForm.hasError('required')) {
       return 'Required';
@@ -144,34 +74,19 @@ export class GridComponent implements OnInit {
     if (this.newRowForm.hasError('colorConflict')) {
       return 'Color already exists.'
     }
-    return ''
-  }
-
-  fromToValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const fromSecond = control.get('fromSecond')?.value;
-      const toSecond = control.get('toSecond')?.value;
-
-      if (fromSecond !== null && toSecond !== null && fromSecond >= toSecond) {
-        return { 'fromGreaterThanTo': true };
-      }
-
-      return null;
-    };
+    return '';
   }
 
   addRow() {
     if (this.newRowForm.valid) {
-      this._rowsData.push(this.newRowForm.value);
-      this.newRowForm.reset({color: '#ffffff'});
+      this.dataService.addRow(this.newRowForm.value);
+      this.newRowForm.reset({ color: '#ffffff' });
       this.showNewRowForm.set(false);
-      this.updateView();
     }
   }
 
   removeRow(row: GridData) {
-    this._rowsData = this._rowsData.filter(r => r !== row);
-    this.updateView();
+    this.dataService.removeRow(row);
   }
 
   updateCurrentSecond(second: number) {

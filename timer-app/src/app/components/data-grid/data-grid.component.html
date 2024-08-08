@@ -43,11 +43,11 @@
           <mat-label>From Seconds</mat-label>
           <input matInput type="number" formControlName="fromSecond" placeholder="From">
         </mat-form-field>
-        @if (control['fromSecond']?.touched && control['fromSecond']?.invalid) {
+        @if (control['fromSecond'].touched && control['fromSecond'].invalid) {
           <mat-error>{{checkRangeError(control['fromSecond'], 'fromSecond')}}</mat-error>
         }
 
-        @if (control['toSecond']?.valid && isFormError('fromGreaterThanTo')) {
+        @if (control['toSecond'].valid && isFormError('fromGreaterThanTo')) {
           <mat-error>{{checkRangeError(newRowForm, 'toSecond')}}</mat-error>
         }
       </div>
@@ -58,7 +58,7 @@
           <input matInput type="number" placeholder="To" formControlName="toSecond">
         </mat-form-field>
 
-        @if (control['toSecond']?.touched && control['toSecond']?.invalid) {
+        @if (control['toSecond'].touched && control['toSecond'].invalid) {
           <mat-error>{{checkRangeError(control['toSecond'], 'toSecond')}}</mat-error>
         }
       </div>
@@ -80,7 +80,7 @@
   }
 
   <div class="range-error">
-    @if (control['toSecond']?.valid && isFormError('timeRangeConflict')) {
+    @if (control['toSecond'].valid && isFormError('timeRangeConflict')) {
       <mat-error>{{checkRangeError(newRowForm, 'toSecond')}}</mat-error>
     }
   </div>
