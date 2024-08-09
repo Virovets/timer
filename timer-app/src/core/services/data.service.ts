@@ -38,7 +38,6 @@ export class DataService {
   }
 
   private loadState(): GridData[] | null {
-    console.log(this.localStorageService);
     return this.localStorageService.getItem<GridData[]>(this.STORAGE_KEY);
   }
 }

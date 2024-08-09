@@ -1,11 +1,7 @@
 import {Component} from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import {GridComponent} from "./components/data-grid/data-grid.component";
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, GridComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

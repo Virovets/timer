@@ -5,13 +5,14 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { DataService } from '../../../core/services/data.service';
-import { ValidationService } from '../../../core/services/validation.service';
+import { DataService } from '../../../../core/services/data.service';
+import { ValidationService } from '../../../../core/services/validation.service';
 import { of } from 'rxjs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import {GridComponent} from "./data-grid.component";
+import {TimerComponent} from "../timer/timer.component";
 
 describe('GridComponent', () => {
   let component: GridComponent;
@@ -21,8 +22,8 @@ describe('GridComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      declarations: [GridComponent, TimerComponent],
       imports: [
-        GridComponent, // Standalone component
         ReactiveFormsModule,
         MatFormFieldModule,
         MatTableModule,

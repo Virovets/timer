@@ -3,23 +3,14 @@ import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TimerComponent } from '../timer/timer.component';
 import { MatError } from '@angular/material/form-field';
-import { errors } from '../../../core/helpers/static-data';
-import {DataService} from "../../../core/services/data.service";
-import {ValidationService} from "../../../core/services/validation.service";
-import {GridData} from "../../../core/interfaces/interfaces";
-import {MaterialModule} from "../../../core/modules/material.module";
+import { errors } from '../../../../core/helpers/static-data';
+import {DataService} from "../../../../core/services/data.service";
+import {ValidationService} from "../../../../core/services/validation.service";
+import {GridData} from "../../../../core/interfaces/interfaces";
+import {MaterialModule} from "../../../../core/modules/material.module";
 
 @Component({
   selector: 'app-grid',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    TimerComponent,
-    ReactiveFormsModule,
-    MaterialModule,
-    MatError
-  ],
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.scss']
 })

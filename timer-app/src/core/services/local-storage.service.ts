@@ -10,7 +10,6 @@ export class LocalStorageService {
   }
 
   setItem<T>(key: string, value: T): void {
-    console.log(value);
     localStorage.setItem(key, JSON.stringify(value));
   }
 

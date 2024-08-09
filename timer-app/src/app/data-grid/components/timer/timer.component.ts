@@ -4,8 +4,6 @@ import {interval, Subscription} from "rxjs";
 
 @Component({
   selector: 'app-timer',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './timer.component.html',
   styleUrl: './timer.component.scss'
 })
